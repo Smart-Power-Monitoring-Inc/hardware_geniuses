@@ -18,4 +18,21 @@ float current() {
   float rawCurrent = analogRead(CURRENT);
   float actCurrent = rawCurrent * resolution;
   Serial.print(actCurrent, 3);
+  return actCurrent;
+}
+
+float voltage() {
+  // Voltage measuring code here
+}
+
+float forwardData() {
+ // code to forward current and voltage to smart hub
+}
+
+float connectToHub() {
+  // code to connect to smart hub network
+}
+
+float switchDevice() {
+  // code to turn off/on device remotely
 }
