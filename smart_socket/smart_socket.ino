@@ -25,14 +25,14 @@ float voltage() {
   // Voltage measuring code here
 }
 
-float forwardData() {
+void forwardData() {
  // code to forward current and voltage to smart hub
 }
 
-float connectToHub() {
+void connectToHub() {
   // code to connect to smart hub network
 }
 
-float switchDevice() {
+void switchDevice() {
   // code to turn off/on device remotely
 }
