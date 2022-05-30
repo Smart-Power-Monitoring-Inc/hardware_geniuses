@@ -11,11 +11,40 @@
 const char* ssid = "Mensah's Nokia";
 const char* password = "lucille2";
 
-/****   Prototypes &    ****/
+unsigned long previousMillis = 0;       // will store last time LED was updated
+const long interval = 5000;             // interval at which to send udp boadcast (milliseconds)
+
+String ipaddress = "";
+const char* udpMsg;
+AsyncUDP udp;
+
+/****   Prototypes & Methods   ****/
+AsyncWebServer server(80);       // Initialize server on port 80
+DNSServer dns;        
 
 void setup() {
   // put your setup code here, to run once:
   pinMode(CURRENT, INPUT);   // setting A0 as read
+
+  Serial.begin(115200);       // Start serial ports
+
+  //Try to connect to WIFI if not, start as AP.
+  AsyncWiFiManager wifiManager(&server,&dns);
+  wifiManager.autoConnect("AutoConnectAP");
+  Serial.println("Connected to WIFI!");
+
+  //Once connected to WIFI, set up and launch webserver.
+  // AsyncServerSetup();
+  server.begin();
+
+  //Print IP address to terminal.
+  ipaddress =  "HUB|"+ WiFi.localIP().toString();
+  Serial.println();
+  Serial.println(ipaddress);
+  Serial.println("Listening...");
+
+  //Connect to UDP Port.
+  udp.connect(IPAddress(192,168,1,255), 19700);
 }
 
 void loop() {
@@ -36,7 +65,8 @@ float current() {
 
 float voltage() {
   // Voltage measuring code here
-  return;
+  float actVoltage;
+  return actVoltage;
 }
 
 void forwardData() {
@@ -45,6 +75,13 @@ void forwardData() {
 
 void connectToHub() {
   // code to connect to smart hub network
+  unsigned long currentMillis = millis();
+  // CheckRadio();
+  if (currentMillis - previousMillis >= interval) 
+  {
+    previousMillis = currentMillis;
+    udp.broadcastTo(ipaddress.c_str(), 19700);
+  }
 }
 
 void switchDevice() {
