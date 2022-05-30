@@ -1,4 +1,17 @@
+/***     Libraries    ***/
+#include "WiFi.h"
+#include "ESPAsyncWebServer.h"
+#include "ESPAsyncWiFiManager.h"  
+#include "AsyncUDP.h"
+
+/**************************
+ *    Variables           *
+ **************************/
 #define CURRENT A0  // Analog pin for nodeMCU
+const char* ssid = "Mensah's Nokia";
+const char* password = "lucille2";
+
+/****   Prototypes &    ****/
 
 void setup() {
   // put your setup code here, to run once:
@@ -23,6 +36,7 @@ float current() {
 
 float voltage() {
   // Voltage measuring code here
+  return;
 }
 
 void forwardData() {
