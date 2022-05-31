@@ -3,6 +3,8 @@
 #include "ESPAsyncWebServer.h"
 #include "ESPAsyncWiFiManager.h"  
 #include "AsyncUDP.h"
+#include "HTTPClient.h"
+#include "ArduinoJson.h"
 
 /**************************
  *    Variables           *
@@ -10,6 +12,11 @@
 #define CURRENT A0  // Analog pin for nodeMCU
 const char* ssid = "Mensah's Nokia";
 const char* password = "lucille2";
+/*
+* BE sure to include the host address where we will be sending and receiving data 
+* const char* host = "http://smarthub/address"
+*/
+
 
 unsigned long previousMillis = 0;       // will store last time LED was updated
 const long interval = 5000;             // interval at which to send udp boadcast (milliseconds)
@@ -18,9 +25,20 @@ String ipaddress = "";
 const char* udpMsg;
 AsyncUDP udp;
 
+WiFiClient client; // WiFi setup 
+
+
 /****   Prototypes & Methods   ****/
 AsyncWebServer server(80);       // Initialize server on port 80
 DNSServer dns;        
+
+void sendData(float current, float voltage);
+float current();
+float voltage();
+void forwardData();
+void forwardData();
+void connectToHub();
+void switchDevice();
 
 void setup() {
   // put your setup code here, to run once:
@@ -86,4 +104,41 @@ void connectToHub() {
 
 void switchDevice() {
   // code to turn off/on device remotely
+}
+
+void sendData(float current, float voltage)
+{
+  // Creating json data
+  StaticJsonBuffer<300> JSONbuffer; //Declaring static JSON buffer
+  JsonObject &JSONencoder = JSONbuffer.createObject();
+
+  //Encoding data
+  JSONencoder["temperature"] = current;
+  JSONencoder["level"] = voltage;
+
+  char JSONmessageBuffer[300];
+  JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+  Serial.println(JSONmessageBuffer);
+
+  // Declaring object class of  the HTTPClient
+  HTTPClient http;
+
+  http.begin(client, "http://192.168.205.185:8000/data/");
+  http.addHeader("Content-Type", "application/json");
+
+  int httpCode = http.POST(JSONmessageBuffer); //Send the request
+  String payload = http.getString();           //Get the response payload
+
+  Serial.println(httpCode); //Print HTTP return code
+  // if (httpCode == 200)
+  // {
+  //   for (int x = 0; x < 5; x++)
+  //   {
+  //     digitalWrite(GRN_LED, HIGH);
+  //     delay(500);
+  //     digitalWrite(GRN_LED, LOW);
+  //     delay(500);
+  //   }
+  // }
+  http.end(); //Close connection
 }
