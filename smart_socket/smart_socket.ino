@@ -17,8 +17,7 @@ const char* password = "lucille2";
 * const char* host = "http://smarthub/address"
 */
 
-
-unsigned long previousMillis = 0;       // will store last time LED was updated
++/+00 time LED was updated
 const long interval = 5000;             // interval at which to send udp boadcast (milliseconds)
 
 String ipaddress = "";
@@ -35,7 +34,6 @@ DNSServer dns;
 void sendData(float current, float voltage);
 float current();
 float voltage();
-void forwardData();
 void forwardData();
 void connectToHub();
 void switchDevice();
@@ -70,7 +68,7 @@ void loop() {
   
 }
 
-
+/********                              FUNCTIONS                           ************/
 // Measuring Current
 float current() {
   float resolution = 3.3 / 1024; // Input Voltage Range is 1V to 3.3V
@@ -87,10 +85,6 @@ float voltage() {
   return actVoltage;
 }
 
-void forwardData() {
- // code to forward current and voltage to smart hub
-}
-
 void connectToHub() {
   // code to connect to smart hub network
   unsigned long currentMillis = millis();
@@ -104,10 +98,54 @@ void connectToHub() {
 
 void switchDevice() {
   // code to turn off/on device remotely
+  HTTPClient http;    //Declare object of class HTTPClient
+
+  Serial.print("Request Link:");
+  Serial.println(host);
+  
+  http.begin(host);     //Specify request destination
+  
+  int httpCode = http.GET();            //Send the request
+  String payload = http.getString();    //Get the response payload from server
+
+  Serial.print("Response Code:"); //200 is OK
+  Serial.println(httpCode);   //Print HTTP return code
+
+  Serial.print("Returned data from Server:");
+  Serial.println(payload);    //Print request response payload
+  
+  if (httpCode == 200)
+  {
+    // Allocate JsonBuffer
+    // Use arduinojson.org/assistant to compute the capacity.
+    const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+    DynamicJsonBuffer jsonBuffer(capacity);
+  
+   // Parse JSON object
+    JsonObject& root = jsonBuffer.parseObject(payload);
+    if (!root.success()) {
+      Serial.println(F("Parsing failed!"));
+      return;
+    }
+  
+    // Decode JSON/Extract values
+    Serial.println(F("Response:"));
+    Serial.println(root["sensor"].as<char*>());
+    Serial.println(root["time"].as<char*>());
+    Serial.println(root["data"][0].as<char*>());
+    Serial.println(root["data"][1].as<char*>());
+  }
+  else
+  {
+    Serial.println("Error in response");
+  }
+
+  http.end();  //Close connection
+  
+  delay(5000);  //GET Data at every 5 seconds
 }
 
-void sendData(float current, float voltage)
-{
+void sendData(float current, float voltage){
   // Creating json data
   StaticJsonBuffer<300> JSONbuffer; //Declaring static JSON buffer
   JsonObject &JSONencoder = JSONbuffer.createObject();
