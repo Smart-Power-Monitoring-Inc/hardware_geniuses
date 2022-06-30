@@ -13,7 +13,6 @@ void setup()
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(SERVER_PIN, OUTPUT);
   pinMode(WIFI_PIN, OUTPUT);
-  /////////////////////////
   if (isRoot)
   {
     connectToWiFi();
@@ -23,7 +22,6 @@ void setup()
 
 void loop()
 {
-  // it will run the user scheduler as well
   mesh.update();
   getWiFiConnectionStatus();
 }
