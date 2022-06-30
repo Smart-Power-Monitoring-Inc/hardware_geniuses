@@ -9,14 +9,14 @@ using namespace std;
 #define RELAY_PIN D1          // relay
 #define SERVER_PIN D2         // relay
 #define WIFI_PIN D3
-#define SERVER_PATH "http://10.42.0.1/summary/current"
+// #define SERVER_PATH "http://10.42.0.1/summary/current"
+#define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
-const char *ssid = SSID;
-const char *password = PASS;
 String deviceName = "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
+#define NODE_ID ASCIISentence(deviceName)
 bool wifiConnected = false;
-bool isRoot = false;
+bool isRoot = true;
 Scheduler userScheduler; // to control your personal task
 painlessMesh mesh;
 DynamicJsonDocument staticDoc(1024);

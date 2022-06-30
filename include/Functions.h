@@ -9,7 +9,7 @@ int ASCIISentence(String str)
     int convert = 0;
     for (int i = 0; i < l; i++)
     {
-        convert = str[i] - NULL;
+        convert = str[i];
     }
     return convert;
 }
@@ -17,13 +17,13 @@ int ASCIISentence(String str)
 void connectToWiFi()
 {
     WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password); // Connect to the network
+    WiFi.begin(SSID, PASS); // Connect to the network
     int i = 0;
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(1000);
         i++;
-        WIFI_CONNECTED(false);
+
         if (i == 100)
         {
             errorBlin_NO_CONNECTION();
@@ -32,11 +32,6 @@ void connectToWiFi()
         Serial.print('.');
         errorBlink();
     }
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        WIFI_CONNECTED(true);
-    }
-
     Serial.print("IP address:\t");
     Serial.println(WiFi.localIP());
     WiFi.setAutoReconnect(true);
@@ -50,20 +45,24 @@ void postData(String data)
     Serial.print("[HTTP] begin...\n");
     if ((WiFi.status() == WL_CONNECTED))
     {
-        if (http.begin(SERVER_PATH, client))
+
+        if (http.begin(client, SERVER_PATH))
         {
-            int httpCode = http.POST(data);
+            // int httpCode = http.POST(data);
+            int httpCode = http.GET();
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
             if (httpCode > 0)
             {
                 // HTTP header has been send and Server response header has been handled
                 Serial.printf("[HTTP] GET... code: %d\n", httpCode);
                 String payload = http.getString();
-                if (httpCode == HTTP_CODE_OK)
+                if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
                 {
                     String payload = http.getString();
                     Serial.println(payload);
                     // Decode JSON
-                    decodeJson(payload);
+                    // decodeJSON(payload);
                     errorBlin_NO_CONNECTION(false);
                 }
             }
@@ -78,6 +77,10 @@ void postData(String data)
             Serial.printf("[HTTP} Unable to connect\n");
             errorBlin_NO_CONNECTION(true);
         }
+    }
+    else
+    {
+        Serial.println("WiFi is not connected");
     }
 }
 
@@ -102,17 +105,15 @@ void errorBlink()
 void errorBlin_NO_CONNECTION(bool state)
 {
     // do something here
-    while (state)
-    {
-        digitalWrite(SERVER_PIN, HIGH);
-        delay(100);
-        digitalWrite(SERVER_PIN, LOW);
-        delay(300);
-        digitalWrite(SERVER_PIN, HIGH);
-        delay(500);
-        digitalWrite(SERVER_PIN, LOW);
-        delay(700);
-    }
+
+    digitalWrite(SERVER_PIN, HIGH);
+    delay(100);
+    digitalWrite(SERVER_PIN, LOW);
+    delay(300);
+    digitalWrite(SERVER_PIN, HIGH);
+    delay(500);
+    digitalWrite(SERVER_PIN, LOW);
+    delay(700);
 }
 
 void errorBlin_NO_CONNECTION()
@@ -145,12 +146,14 @@ void nodeTimeAdjustedCallback(int32_t offset)
 
 void onWiFiConnect(const WiFiEventStationModeGotIP &event)
 {
-    Serial.print("Connected to WiFi successfully");
+    Serial.println("Connected to WiFi successfully");
 }
 
 void onWiFiDisconnect(const WiFiEventSoftAPModeStationDisconnected &event)
 {
     Serial.println("trying to connect");
+    // WiFi.disconnect();
+    // connectToWiFi();
 }
 
 void receivedCallback(uint32_t from, String &msg)
@@ -161,7 +164,8 @@ void receivedCallback(uint32_t from, String &msg)
     //  %s String
     Serial.printf("Received from %u msg=%s\n ", from, msg.c_str());
     // parse data here
-    // JSONVar parseJson = JSON.parse(msg.c_str());
+    JSONVar parseJson = JSON.parse(msg.c_str());
+    postData(JSON.stringify(parseJson));
     // int nodeId = parseJson["id"];               // short node id
     // const char *command = parseJson["command"]; // command to be issued to the node
     // const char *current = parseJson["current"]; // node current
@@ -191,7 +195,6 @@ void initMesh()
     wifiConnectHandler = WiFi.onStationModeGotIP(onWiFiConnect);
     wifiDisconnectHandler = WiFi.onSoftAPModeStationDisconnected(onWiFiDisconnect);
     // connectToWiFi(); // Comment this out if uploading to other nodes. Only use this for node 1
-
     //  mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
     mesh.setDebugMsgTypes(ERROR | STARTUP); // set before init() so that you can see startup messages
     mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
@@ -207,9 +210,9 @@ void initMesh()
 void getWiFiConnectionStatus()
 {
     unsigned long currentMillis = millis();
-
     if (currentMillis - previousMillis >= interval)
     {
+        WIFI_CONNECTED();
         switch (WiFi.status())
         {
         case WL_CONNECTED:
@@ -231,15 +234,14 @@ void getWiFiConnectionStatus()
             break;
         }
         previousMillis = currentMillis;
-        Serial.print("WIFI STATUS ");
-        Serial.println(WiFi.status());
     }
 }
 
-void WIFI_CONNECTED(bool state)
+void WIFI_CONNECTED()
 
 {
-    if (state)
+
+    if (WiFi.status() == WL_CONNECTED)
     {
         digitalWrite(WIFI_PIN, HIGH);
     }
@@ -270,10 +272,6 @@ String getCurrentReading()
 // Not on node 1
 void switchOffNodeRelay()
 {
-    // Swtich of the relay of the node if the command is received
-    // command - switch
-    // parse on or off command
-
     if (toggle)
     {
         digitalWrite(RELAY_PIN, HIGH);
@@ -288,10 +286,7 @@ void switchOffNodeRelay()
 
 void sendMessage()
 {
-    // to be used by the nodes
-    // serializeJson( getCurrentReading());
     String msg = getCurrentReading();
     mesh.sendBroadcast(msg);
-
     taskSendMessage.setInterval(random(TASK_SECOND * 1, TASK_SECOND * 5));
 }
