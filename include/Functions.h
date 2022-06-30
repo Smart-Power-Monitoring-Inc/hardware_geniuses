@@ -64,16 +64,19 @@ void postData(String data)
                     Serial.println(payload);
                     // Decode JSON
                     decodeJson(payload);
+                    errorBlin_NO_CONNECTION(false);
                 }
             }
             else
             {
                 Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+                errorBlin_NO_CONNECTION(true);
             }
         }
         else
         {
             Serial.printf("[HTTP} Unable to connect\n");
+            errorBlin_NO_CONNECTION(true);
         }
     }
 }
@@ -102,9 +105,13 @@ void errorBlin_NO_CONNECTION(bool state)
     while (state)
     {
         digitalWrite(SERVER_PIN, HIGH);
+        delay(100);
+        digitalWrite(SERVER_PIN, LOW);
+        delay(300);
+        digitalWrite(SERVER_PIN, HIGH);
         delay(500);
         digitalWrite(SERVER_PIN, LOW);
-        delay(200);
+        delay(700);
     }
 }
 
@@ -197,7 +204,7 @@ void initMesh()
     taskSendMessage.enable();
 }
 
-void getWiFiConnectionStatud()
+void getWiFiConnectionStatus()
 {
     unsigned long currentMillis = millis();
 
@@ -230,6 +237,7 @@ void getWiFiConnectionStatud()
 }
 
 void WIFI_CONNECTED(bool state)
+
 {
     if (state)
     {
@@ -239,4 +247,51 @@ void WIFI_CONNECTED(bool state)
     {
         digitalWrite(WIFI_PIN, LOW);
     }
+}
+
+String getCurrentReading()
+{
+    JSONVar doc;
+    String json = "";
+    doc["id"] = NODE_ID;
+    doc["current"] = analogRead(A0);
+    // doc["time"] = millis();
+    doc["name"] = deviceName;
+    doc["command"] = "";
+    json = JSON.stringify(doc);
+
+    // Not on node 1
+    // Used to get the current readings
+    // Only used every other node except node 1
+    // return current readings
+    return json;
+}
+
+// Not on node 1
+void switchOffNodeRelay()
+{
+    // Swtich of the relay of the node if the command is received
+    // command - switch
+    // parse on or off command
+
+    if (toggle)
+    {
+        digitalWrite(RELAY_PIN, HIGH);
+        toggle = !toggle;
+    }
+    else
+    {
+        digitalWrite(RELAY_PIN, LOW);
+        toggle = !toggle;
+    }
+}
+
+void sendMessage()
+{
+    // to be used by the nodes
+    // serializeJson( getCurrentReading());
+    String msg = getCurrentReading();
+    mesh.sendBroadcast(msg);
+
+    taskSendMessage.setInterval(random(TASK_SECOND * 1, TASK_SECOND * 5));
 }
