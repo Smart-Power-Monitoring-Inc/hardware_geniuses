@@ -20,7 +20,8 @@ int count;
 #define RELAY_PIN D1  // relay
 #define SERVER_PIN D2 // relay
 #define WIFI_PIN D3
-#define SERVER_PATH "http://10.88.138.101:3000/summary/current?accountId="
+// #define SERVER_PATH "http://10.88.138.101:3000/summary/current?accountId="
+#define SERVER_PATH "http://10.88.138.100:3000/summary/current?accountId="
 // #define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
