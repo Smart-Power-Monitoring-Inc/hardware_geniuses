@@ -13,15 +13,18 @@ void setup()
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(SERVER_PIN, OUTPUT);
   pinMode(WIFI_PIN, OUTPUT);
+
+  initMesh();
   if (isRoot)
   {
-    connectToWiFi();
+    createHotspot();
+    // connectToWiFi();
   }
-  initMesh();
 }
 
 void loop()
 {
   mesh.update();
-  getWiFiConnectionStatus();
+
+  // getWiFiConnectionStatus();
 }

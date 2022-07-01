@@ -38,6 +38,15 @@ void connectToWiFi()
     WiFi.persistent(true);
 }
 
+void createHotspot()
+{
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(AP_SSID, AP_PASS);
+    myAPIP = WiFi.softAPIP();
+    Serial.print("AP IP address:\t");
+    Serial.println(myAPIP);
+}
+
 void postData(String data)
 { // called when a node sends a message
     WiFiClient client;
@@ -197,14 +206,37 @@ void initMesh()
     // connectToWiFi(); // Comment this out if uploading to other nodes. Only use this for node 1
     //  mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
     mesh.setDebugMsgTypes(ERROR | STARTUP); // set before init() so that you can see startup messages
-    mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
+    mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT, WIFI_AP_STA, 6);
+    // mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
     mesh.onReceive(&receivedCallback);
     mesh.onNewConnection(&newConnectionCallback);
     mesh.onChangedConnections(&changedConnectionCallback);
     mesh.onNodeTimeAdjusted(&nodeTimeAdjustedCallback);
-
     userScheduler.addTask(taskSendMessage);
     taskSendMessage.enable();
+
+    mesh.stationManual(SSID, PASS);
+    mesh.setHostname(HOSTNAME);
+
+    // Bridge node, should (in most cases) be a root node. See [the wiki](https://gitlab.com/painlessMesh/painlessMesh/wikis/Possible-challenges-in-mesh-formation) for some background
+    if (isRoot)
+    {
+        mesh.setRoot(true);
+    }
+    else
+    {
+        // This node and all other nodes should ideally know the mesh contains a root, so call this on all nodes
+        mesh.setContainsRoot(true);
+    }
+
+    // Async webserver
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->send(200, "text/html", "<h1>Hello World!</h1>"); });
+
+    server.begin();
+
+    myAPIP = IPAddress(mesh.getAPIP());
+    Serial.println("My AP IP is " + myAPIP.toString());
 }
 
 void getWiFiConnectionStatus()
@@ -289,4 +321,8 @@ void sendMessage()
     String msg = getCurrentReading();
     mesh.sendBroadcast(msg);
     taskSendMessage.setInterval(random(TASK_SECOND * 1, TASK_SECOND * 5));
+}
+IPAddress getlocalIP()
+{
+    return IPAddress(mesh.getStationIP());
 }

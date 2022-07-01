@@ -14,3 +14,4 @@ JSONVar decodeJSON(String json);
 void initMesh();
 void getWiFiConnectionStatus();
 void errorBlin_NO_CONNECTION(bool state);
+void createHotspot();
