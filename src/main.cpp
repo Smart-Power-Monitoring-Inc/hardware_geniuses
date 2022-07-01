@@ -13,18 +13,17 @@ void setup()
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(SERVER_PIN, OUTPUT);
   pinMode(WIFI_PIN, OUTPUT);
-
   initMesh();
-  if (isRoot)
+  if (MDNS.begin("esp8266"))
   {
-    createHotspot();
-    // connectToWiFi();
+    Serial.println("MDNS responder started");
   }
 }
 
 void loop()
 {
   mesh.update();
-
+  server.handleClient();
+  MDNS.update();
   // getWiFiConnectionStatus();
 }

@@ -13,18 +13,21 @@ using namespace std;
 #define HOSTNAME "HTTP_BRIDGE"
 #define AP_SSID "."
 #define AP_PASS "lucille2"
+#define DEVICE_NAME isRoot ? "ROOT" : "Bless"
+station_info stationInfo;
+int count;
 /////////////////////////////////
 #define RELAY_PIN D1  // relay
 #define SERVER_PIN D2 // relay
 #define WIFI_PIN D3
-// #define SERVER_PATH "http://10.42.0.1/summary/current"
-#define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
+#define SERVER_PATH "http://10.88.138.101:3000/summary/current?accountId="
+// #define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
-#define NODE_ID ASCIISentence(deviceName)
+#define NODE_ID ASCIISentence(DEVICE_NAME)
 bool wifiConnected = false;
 bool isRoot = true;
-String deviceName = isRoot ? "ROOT" : "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
+// String deviceName = isRoot ? "ROOT" : "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
 
 Scheduler userScheduler; // to control your personal task
 painlessMesh mesh;
@@ -33,6 +36,7 @@ bool toggle = false; // pin status of node's relay
 WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
 JSONVar parseJson;
-AsyncWebServer server(80);
+ESP8266WebServer server(80);
 IPAddress myIP(0, 0, 0, 0);
 IPAddress myAPIP(0, 0, 0, 0);
+String accountId = "";
