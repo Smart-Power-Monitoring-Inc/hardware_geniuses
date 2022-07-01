@@ -21,10 +21,11 @@ using namespace std;
 #define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
-String deviceName = "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
 #define NODE_ID ASCIISentence(deviceName)
 bool wifiConnected = false;
 bool isRoot = true;
+String deviceName = isRoot ? "ROOT" : "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
+
 Scheduler userScheduler; // to control your personal task
 painlessMesh mesh;
 DynamicJsonDocument staticDoc(1024);

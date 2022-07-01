@@ -45,6 +45,7 @@ void createHotspot()
     myAPIP = WiFi.softAPIP();
     Serial.print("AP IP address:\t");
     Serial.println(myAPIP);
+    HOTSPOT_CREATED();
 }
 
 void postData(String data)
@@ -161,8 +162,6 @@ void onWiFiConnect(const WiFiEventStationModeGotIP &event)
 void onWiFiDisconnect(const WiFiEventSoftAPModeStationDisconnected &event)
 {
     Serial.println("trying to connect");
-    // WiFi.disconnect();
-    // connectToWiFi();
 }
 
 void receivedCallback(uint32_t from, String &msg)
@@ -231,7 +230,7 @@ void initMesh()
 
     // Async webserver
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(200, "text/html", "<h1>Hello World!</h1>"); });
+              { request->send(200, "text/html", "<h1>Hello, Welcome to Keeps's Smaart Power Monitoring Site!</h1>"); });
 
     server.begin();
 
@@ -244,35 +243,16 @@ void getWiFiConnectionStatus()
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval)
     {
-        WIFI_CONNECTED();
+        HOTSPOT_CREATED();
         switch (WiFi.status())
-        {
-        case WL_CONNECTED:
-            Serial.println("WiFi connected");
-            Serial.println(WiFi.softAPIP());
-            break;
-        case WL_CONNECT_FAILED:
-            Serial.println("Connection failed");
-            break;
-
-        case WL_NO_SSID_AVAIL:
-            Serial.println("SSID not available");
-            break;
-        case WL_IDLE_STATUS:
-            Serial.println("Idle status");
-            // connectToWiFi();
-            break;
-        default:
-            break;
-        }
+        WiFi.
         previousMillis = currentMillis;
     }
 }
 
-void WIFI_CONNECTED()
+void HOTSPOT_CREATED()
 
 {
-
     if (WiFi.status() == WL_CONNECTED)
     {
         digitalWrite(WIFI_PIN, HIGH);

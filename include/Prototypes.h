@@ -9,7 +9,7 @@ String getCurrentReading();
 void switchOffNodeRelay();
 void postData(String data);
 void errorBlink();
-void WIFI_CONNECTED();
+void HOTSPOT_CREATED();
 JSONVar decodeJSON(String json);
 void initMesh();
 void getWiFiConnectionStatus();
