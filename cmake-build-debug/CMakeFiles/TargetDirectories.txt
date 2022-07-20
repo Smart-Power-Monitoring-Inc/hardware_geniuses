@@ -1,0 +1,3 @@
+/Users/napoleon/Desktop/hardware_section/cmake-build-debug/CMakeFiles/hardware_section.dir
+/Users/napoleon/Desktop/hardware_section/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/napoleon/Desktop/hardware_section/cmake-build-debug/CMakeFiles/rebuild_cache.dir

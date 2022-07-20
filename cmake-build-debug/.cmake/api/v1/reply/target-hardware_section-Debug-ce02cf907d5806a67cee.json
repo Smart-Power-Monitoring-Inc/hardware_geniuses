@@ -1,0 +1,376 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "hardware_section"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 15,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 6,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 8,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 9,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 10,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 12,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 13,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk"
+				},
+				{
+					"fragment" : "-std=gnu++14"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"path" : "/Users/napoleon/Desktop/hardware_section/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/examples"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/examples/CaptivePortal"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/examples/ESP_AsyncFSBrowser"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/examples/regex_patterns"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/examples/simple_server"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/Users/napoleon/Desktop/hardware_section/lib/ESPAsyncWebServer-master/src"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/Users/napoleon/Desktop/hardware_section/smart_socket"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "14"
+			},
+			"sourceIndexes" : 
+			[
+				8,
+				11,
+				15,
+				18,
+				21,
+				22,
+				24,
+				25,
+				27
+			]
+		}
+	],
+	"id" : "hardware_section::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "",
+				"role" : "flags"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "hardware_section",
+	"nameOnDisk" : "hardware_section",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				9,
+				10,
+				12,
+				13,
+				14,
+				16,
+				17,
+				19,
+				20,
+				23
+			]
+		},
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				4,
+				5,
+				6,
+				7,
+				26
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				8,
+				11,
+				15,
+				18,
+				21,
+				22,
+				24,
+				25,
+				27
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "include/Functions.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "include/Libraries.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "include/Prototypes.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "include/Variables.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/examples/CaptivePortal/CaptivePortal.ino",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/examples/ESP_AsyncFSBrowser/ESP_AsyncFSBrowser.ino",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/examples/regex_patterns/regex_patterns.ino",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/examples/simple_server/simple_server.ino",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncEventSource.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncEventSource.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncJson.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncWebSocket.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncWebSocket.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/AsyncWebSynchronization.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/ESPAsyncWebServer.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/SPIFFSEditor.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/SPIFFSEditor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/StringArray.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebAuthentication.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebAuthentication.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebHandlerImpl.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebHandlers.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebRequest.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebResponseImpl.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebResponses.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/ESPAsyncWebServer-master/src/WebServer.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "smart_socket/smart_socket.ino",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/main.cpp",
+			"sourceGroupIndex" : 2
+		}
+	],
+	"type" : "EXECUTABLE"
+}

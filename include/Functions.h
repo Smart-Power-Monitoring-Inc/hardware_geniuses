@@ -24,7 +24,7 @@ void postData(String data)
     if (accountId == "") // Only proceed when the account id is set
         return;
     Serial.print("[HTTP] begin...\n");
-    
+
     if (http.begin(client, path))
     {
         // int httpCode = http.POST(data);
@@ -44,19 +44,16 @@ void postData(String data)
                 Serial.println(payload);
                 // Decode JSON
                 // decodeJSON(payload);
-                errorBlin_NO_CONNECTION(false);
             }
         }
         else
         {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-            errorBlin_NO_CONNECTION(true);
         }
     }
     else
     {
         Serial.printf("[HTTP} Unable to connect\n");
-        errorBlin_NO_CONNECTION(true);
     }
 }
 
@@ -70,44 +67,36 @@ JSONVar decodeJson(String json)
     return parseJson;
 }
 
-void errorBlink()
+void dataTransferBlink()
 {
-    // do something here
-    digitalWrite(SERVER_PIN, HIGH);
-    delay(500);
-    digitalWrite(SERVER_PIN, LOW);
-    delay(200);
-}
-void errorBlin_NO_CONNECTION(bool state)
-{
-    // do something here
-    digitalWrite(SERVER_PIN, HIGH);
+    digitalWrite(AMBER, HIGH);
     delay(100);
-    digitalWrite(SERVER_PIN, LOW);
-    delay(300);
-    digitalWrite(SERVER_PIN, HIGH);
-    delay(500);
-    digitalWrite(SERVER_PIN, LOW);
-    delay(700);
+    digitalWrite(AMBER, LOW);
+    delay(100);
+    digitalWrite(AMBER, HIGH);
+    delay(100);
+    digitalWrite(AMBER, LOW);
+    delay(10);
 }
 
-void errorBlin_NO_CONNECTION()
+void dataReceivedBlink()
 {
-
-    digitalWrite(SERVER_PIN, HIGH);
-    delay(200);
-    digitalWrite(SERVER_PIN, LOW);
-    delay(200);
+    digitalWrite(BLUE, HIGH);
+    delay(100);
+    digitalWrite(BLUE, LOW);
+    delay(50);
 }
 
 void newConnectionCallback(uint32_t nodeId)
 {
     Serial.printf("--> New Connection, nodeId = %u\n", nodeId);
+    dataReceivedBlink();
 }
 
 void changedConnectionCallback()
 {
     Serial.printf("Changed connections\n");
+    dataReceivedBlink();
 }
 
 void nodeTimeAdjustedCallback(int32_t offset)
@@ -131,28 +120,9 @@ void receivedCallback(uint32_t from, String &msg)
     // parse data here
     JSONVar parseJson = JSON.parse(msg.c_str());
     postData(JSON.stringify(parseJson));
-    // int nodeId = parseJson["id"];               // short node id
-    // const char *command = parseJson["command"]; // command to be issued to the node
-    // const char *current = parseJson["current"]; // node current
-    // const char *name = parseJson["name"];       // node name
-    //                                             /*
-    //                                             If command == switch
-    //                                             toggle on/off the node's relay
-    //                                             if command  == node
-    //                                             error = node should parse the error command
-    //                                             */
-    // if (command == "switch" && nodeId == NODE_ID)
-    // {
-    //     // ensure the correct node toggles switch
-    //     switchOffNodeRelay();
-    // }
-    // if (command == "error")
-    // {
-    //     // call error functions
-    //     errorBlink();
-    // }
-    // // only for node 1
-    // postData("sdfsdfsdf");
+    const char *uid = parseJson["uid"];
+    switchOffNodeRelay(uid);
+    dataReceivedBlink();
 }
 
 void initMesh()
@@ -170,23 +140,22 @@ void initMesh()
     mesh.onNodeTimeAdjusted(&nodeTimeAdjustedCallback);
     userScheduler.addTask(taskSendMessage);
     taskSendMessage.enable();
-    HOTSPOT_CREATED();
 
     if (isRoot)
     {
         mesh.setRoot(true);
+        server.on("/", homeRoute);
+        server.on("/user", HTTP_POST, updateAccountID);
+        server.on("/toogle", HTTP_POST, broadcast);
+        server.begin();
+        myAPIP = IPAddress(mesh.getAPIP());
+        Serial.println("My AP IP is " + myAPIP.toString());
     }
     else
     {
         // This node and all other nodes should ideally know the mesh contains a root, so call this on all nodes
         mesh.setContainsRoot(true);
     }
-    // Async webserver
-    server.on("/", homeRoute);
-    server.on("/user", HTTP_POST, updateAccountID);
-    server.begin();
-    myAPIP = IPAddress(mesh.getAPIP());
-    Serial.println("My AP IP is " + myAPIP.toString());
 }
 
 void homeRoute()
@@ -198,7 +167,6 @@ void updateAccountID()
 {
     if (server.method() == HTTP_POST)
     {
-
         if (server.hasArg("id"))
         {
             accountId = server.arg("id");
@@ -206,12 +174,6 @@ void updateAccountID()
         }
     }
     server.send(200, "text/plain", "Done");
-}
-
-void HOTSPOT_CREATED()
-
-{
-    digitalWrite(WIFI_PIN, HIGH);
 }
 
 String getCurrentReading()
@@ -226,20 +188,49 @@ String getCurrentReading()
     return json;
 }
 
-void switchOffNodeRelay()
+void broadcast()
 {
-    // Not on node 1
-    if (!isRoot) // Run only on other nodes
+    String json = "";
+    if (server.method() == HTTP_POST)
     {
-        if (toggle)
+        if (server.hasArg("uid"))
         {
-            digitalWrite(RELAY_PIN, HIGH);
-            toggle = !toggle;
+            String data = server.arg("uid");
+            json += data;
+            mesh.sendBroadcast(json);
         }
-        else
+    }
+    server.send(200, "text/plain", "Done");
+}
+
+String getVoltageReading()
+{
+    JSONVar doc;
+    String json = "";
+    doc["id"] = NODE_ID;
+    doc["current"] = analogRead(A0);
+    doc["name"] = DEVICE_NAME;
+    doc["command"] = "";
+    json = JSON.stringify(doc);
+    return json;
+}
+
+void switchOffNodeRelay(String id)
+{
+    if (id == String(NODE_ID))
+    {
+        if (!isRoot) // Run only on other nodes
         {
-            digitalWrite(RELAY_PIN, LOW);
-            toggle = !toggle;
+            if (toggle)
+            {
+                digitalWrite(RELAY_PIN, LOW);
+                toggle = !toggle;
+            }
+            else
+            {
+                digitalWrite(RELAY_PIN, HIGH);
+                toggle = !toggle;
+            }
         }
     }
 }
@@ -249,6 +240,8 @@ void sendMessage()
     String msg = getCurrentReading();
     mesh.sendBroadcast(msg);
     taskSendMessage.setInterval(random(TASK_SECOND * 1, TASK_SECOND * 5));
+    dataTransferBlink();
+    digitalWrite(RELAY_PIN, LOW);
 }
 
 IPAddress getlocalIP()

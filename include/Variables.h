@@ -17,17 +17,21 @@ using namespace std;
 station_info stationInfo;
 int count;
 /////////////////////////////////
-#define RELAY_PIN D1  // relay
-#define SERVER_PIN D2 // relay
-#define WIFI_PIN D3
+const int RELAY_PIN = 5; // relay
+#define AMBER 12
+#define RED D7
+#define BLUE D8
+#define VOLTAGE D2
+#define CURRENT D3
+
 // #define SERVER_PATH "http://10.88.138.101:3000/summary/current?accountId="
-#define SERVER_PATH "http://10.88.138.100:3000/summary/current?accountId="
+#define SERVER_PATH "http://10.192.18.110:3000/summary/current?accountId="
 // #define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
 #define NODE_ID ASCIISentence(DEVICE_NAME)
 bool wifiConnected = false;
-bool isRoot = true;
+bool isRoot = false;
 // String deviceName = isRoot ? "ROOT" : "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
 
 Scheduler userScheduler; // to control your personal task
@@ -40,4 +44,4 @@ JSONVar parseJson;
 ESP8266WebServer server(80);
 IPAddress myIP(0, 0, 0, 0);
 IPAddress myAPIP(0, 0, 0, 0);
-String accountId = "";
+String accountId = "62cc2c675065faa3815663ec";
