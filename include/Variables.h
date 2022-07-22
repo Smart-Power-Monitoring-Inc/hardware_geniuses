@@ -17,7 +17,7 @@ using namespace std;
 station_info stationInfo;
 int count;
 /////////////////////////////////
-const int RELAY_PIN = 5; // relay
+const int RELAY_PIN = 12; // relay
 #define AMBER 12
 #define RED D7
 #define BLUE D8
@@ -26,12 +26,13 @@ const int RELAY_PIN = 5; // relay
 
 // #define SERVER_PATH "http://10.88.138.101:3000/summary/current?accountId="
 #define SERVER_PATH "http://10.192.18.110:3000/summary/current?accountId="
+#define VOLTAGE_PATH "http://10.192.18.110:3000/summary/" + accountId + "/voltage"
 // #define SERVER_PATH "http://api.freerealapi.com/comments/618a862db883dbaafa9449c5"
 unsigned long previousMillis = 0;
 unsigned long interval = 5000;
 #define NODE_ID ASCIISentence(DEVICE_NAME)
 bool wifiConnected = false;
-bool isRoot = false;
+bool isRoot = true;
 // String deviceName = isRoot ? "ROOT" : "Bless"; // Set this value for each smart socket. THeir names are under the esp82366
 
 Scheduler userScheduler; // to control your personal task

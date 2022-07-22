@@ -41,9 +41,6 @@ void postData(String data)
             if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
             {
                 String payload = http.getString();
-                Serial.println(payload);
-                // Decode JSON
-                // decodeJSON(payload);
             }
         }
         else
@@ -122,6 +119,10 @@ void receivedCallback(uint32_t from, String &msg)
     postData(JSON.stringify(parseJson));
     const char *uid = parseJson["uid"];
     switchOffNodeRelay(uid);
+    if (isRoot)
+    {
+        getVoltageReading();
+    }
     dataReceivedBlink();
 }
 
@@ -130,8 +131,8 @@ void initMesh()
     wifiConnectHandler = WiFi.onStationModeGotIP(onWiFiConnect);
     wifiDisconnectHandler = WiFi.onSoftAPModeStationDisconnected(onWiFiDisconnect);
     // connectToWiFi(); // Comment this out if uploading to other nodes. Only use this for node 1
-    //  mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
-    mesh.setDebugMsgTypes(ERROR | STARTUP); // set before init() so that you can see startup messages
+    mesh.setDebugMsgTypes(ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE); // all types on
+    // mesh.setDebugMsgTypes(ERROR | STARTUP);                                                                        // set before init() so that you can see startup messages
     mesh.init(AP_SSID, AP_PASS, &userScheduler, MESH_PORT, WIFI_AP_STA, 6);
     // mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
     mesh.onReceive(&receivedCallback);
@@ -144,6 +145,7 @@ void initMesh()
     if (isRoot)
     {
         mesh.setRoot(true);
+        mesh.setContainsRoot(true);
         server.on("/", homeRoute);
         server.on("/user", HTTP_POST, updateAccountID);
         server.on("/toogle", HTTP_POST, broadcast);
@@ -193,32 +195,80 @@ void broadcast()
     String json = "";
     if (server.method() == HTTP_POST)
     {
-        if (server.hasArg("uid"))
-        {
-            String data = server.arg("uid");
-            json += data;
-            mesh.sendBroadcast(json);
-        }
+        Serial.println(server.arg(0));
+        String data = server.arg(0);
+        json += data;
+        mesh.sendBroadcast(json);
+        Serial.print("Relay Toggle Command: ");
+        Serial.println(json);
     }
     server.send(200, "text/plain", "Done");
 }
 
 String getVoltageReading()
 {
+    WiFiClient client;
+    HTTPClient http;
     JSONVar doc;
     String json = "";
     doc["id"] = NODE_ID;
-    doc["current"] = analogRead(A0);
-    doc["name"] = DEVICE_NAME;
-    doc["command"] = "";
     json = JSON.stringify(doc);
+    // int R1 = 30000; // before intersection
+    // int R2 = 7500;  // ground
+    // float measuredVoltage = ((R2 / (R2 + R1)) * 9);
+    int avg = 0;
+    // Get average v reading
+    for (int i = 0; i < 100; i++)
+    {
+        avg += analogRead(A0);
+    }
+    avg /= 100;
+    float float_avg = String(avg).toFloat();
+    float first_cnv = (float_avg * 5 / 1023);
+    // 1.8v == 220 -240
+    // new reading is ?
+    // 5 =240
+    float val = (first_cnv / 5) * 220;
+    doc["voltage"] = val;
+    String path = VOLTAGE_PATH + "?value=" + val;
+    Serial.print("Measured voltage: ");
+    Serial.println(val);
+    if (http.begin(client, path))
+    {
+        // int httpCode = http.POST(data);
+        int httpCode = http.POST(json);
+        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+        if (httpCode > 0)
+        {
+            // HTTP header has been send and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+            String payload = http.getString();
+            if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+            {
+                String payload = http.getString();
+                // Serial.println(payload);
+                // Decode JSON
+                // decodeJSON(payload);
+            }
+        }
+        else
+        {
+            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+    }
     return json;
 }
 
 void switchOffNodeRelay(String id)
 {
+    Serial.print("This is the node id: ");
+    Serial.println(id);
     if (id == String(NODE_ID))
     {
+        digitalWrite(RELAY_PIN, HIGH);
+        delay(3000);
+        digitalWrite(RELAY_PIN, LOW);
         if (!isRoot) // Run only on other nodes
         {
             if (toggle)
