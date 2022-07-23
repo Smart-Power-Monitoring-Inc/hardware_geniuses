@@ -17,7 +17,7 @@ using namespace std;
 station_info stationInfo;
 int count;
 /////////////////////////////////
-const int RELAY_PIN = 12; // relay
+const int RELAY_PIN = D5; // relay
 #define AMBER 12
 #define RED D7
 #define BLUE D8
@@ -46,3 +46,4 @@ ESP8266WebServer server(80);
 IPAddress myIP(0, 0, 0, 0);
 IPAddress myAPIP(0, 0, 0, 0);
 String accountId = "62cc2c675065faa3815663ec";
+String uid = "";

@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "painlessMesh.h"
 #include <ESP8266WiFi.h>
+#include <LittleFS.h>
 #include <ESP8266HTTPClient.h>
 #include <string>
 #include <Arduino_JSON.h>
@@ -11,10 +12,11 @@ void setup()
 {
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
-  pinMode(RELAY_PIN, INPUT);
+  // pinMode(RELAY_PIN, INPUT);
   pinMode(AMBER, OUTPUT);
   pinMode(RED, OUTPUT);
   pinMode(BLUE, OUTPUT);
+  // digitalWrite(RELAY_PIN, HIGH);
   if (isRoot)
   {
     pinMode(CURRENT, OUTPUT);
